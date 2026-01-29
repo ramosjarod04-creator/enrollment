@@ -6,10 +6,9 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from django.db.models import Q  # Added this for search functionality
+from django.db.models import Q
 from .models import Student, Program, Enrollment, Notification
 from .forms import RegisterForm, StudentProfileForm, EnrollmentForm, ProgramForm
-
 
 # ============================================
 # AUTHENTICATION
@@ -278,20 +277,29 @@ def enrollment_create_view(request):
     if request.method == 'POST':
         form = EnrollmentForm(request.POST)
         if form.is_valid():
-            enrollment = form.save(commit=False)
-            enrollment.student = student
-            
-            if request.user.is_staff and request.POST.get('auto_approve'):
-                enrollment.status = 'approved'
-                enrollment.reviewed_by = request.user
-                enrollment.reviewed_at = timezone.now()
-                messages.success(request, 'Enrollment created and auto-approved!')
-            else:
-                enrollment.status = 'pending'
-                messages.success(request, 'Enrollment submitted! Waiting for approval.')
-            
-            enrollment.save()
-            return redirect('enrollment_list')
+            try:
+                enrollment = form.save(commit=False)
+                enrollment.student = student
+                
+                # Admin Auto-Approve Logic
+                if request.user.is_staff and request.POST.get('auto_approve'):
+                    enrollment.status = 'approved'
+                    enrollment.reviewed_by = request.user
+                    enrollment.reviewed_at = timezone.now()
+                    msg = 'Enrollment created and auto-approved!'
+                else:
+                    enrollment.status = 'pending'
+                    msg = 'Enrollment submitted! Waiting for approval.'
+                
+                enrollment.save()
+                messages.success(request, msg)
+                return redirect('enrollment_list')
+
+            except IntegrityError:
+                # This catches the (student, program, school_year) duplicate error
+                messages.error(request, 'Error: You are already enrolled in this program for the selected school year.')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = EnrollmentForm()
     
