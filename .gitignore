@@ -1,0 +1,30 @@
+# --- Python / Django Base ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- Databases ---
+db.sqlite3
+db.sqlite3-journal
+
+# --- Secrets & Config ---
+.env
+.venv
+vitals/
+
+# --- Media & Static ---
+# We ignore media because it contains user-uploaded files
+media/
+# We usually ignore staticfiles (the collectstatic output) 
+# but keep the static/ source folder
+staticfiles/
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db

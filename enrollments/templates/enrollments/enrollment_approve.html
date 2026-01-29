@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Approve Enrollment{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Approve Enrollment</h1>
+    </div>
+    
+    <div class="form-card">
+        <h3>Enrollment Details</h3>
+        <ul class="detail-list">
+            <li><strong>Student:</strong> {{ enrollment.student.get_full_name }}</li>
+            <li><strong>Program:</strong> {{ enrollment.program.name }}</li>
+            <li><strong>School Year:</strong> {{ enrollment.school_year }}</li>
+            <li><strong>Year Level:</strong> {{ enrollment.get_year_level_display }}</li>
+        </ul>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_admin_notes">Notes (Optional)</label>
+                <textarea name="admin_notes" id="id_admin_notes" class="form-input" rows="3" placeholder="e.g., 'All requirements verified.'"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <a href="{% url 'enrollment_list' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-success">Confirm Approval</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

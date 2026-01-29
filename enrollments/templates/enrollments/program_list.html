@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Programs{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Available Programs</h1>
+        {% if user.is_staff %}
+        <a href="{% url 'program_create' %}" class="btn btn-primary">Create New Program</a>
+        {% endif %}
+    </div>
+
+    <form method="get" class="filter-form card">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id_search">Search</label>
+                <input type="text" name="search" id="id_search" value="{{ search }}" class="form-input" placeholder="Search by name or code...">
+            </div>
+            <div class="form-group">
+                <label for="id_type">Type</label>
+                <select name="type" id="id_type" class="form-select">
+                    <option value="" {% if not program_type %}selected{% endif %}>All Types</option>
+                    <option value="undergraduate" {% if program_type == 'undergraduate' %}selected{% endif %}>Undergraduate</option>
+                    <option value="graduate" {% if program_type == 'graduate' %}selected{% endif %}>Graduate</option>
+                    <option value="vocational" {% if program_type == 'vocational' %}selected{% endif %}>Vocational</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="id_status">Status</label>
+                <select name="status" id="id_status" class="form-select">
+                    <option value="" {% if not status %}selected{% endif %}>All</option>
+                    <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <a href="{% url 'program_list' %}" class="btn btn-secondary">Clear</a>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+
+    <div class="program-list-container">
+        {% for program in programs %}
+        <div class="card program-card">
+            <div class="program-card-header">
+                <span class="program-code">{{ program.code }}</span>
+                {% if program.is_active %}
+                    <span class="badge success">Active</span>
+                {% else %}
+                    <span class="badge danger">Inactive</span>
+                {% endif %}
+            </div>
+            <div class="program-card-body">
+                <h3>{{ program.name }}</h3>
+                <p>{{ program.description|truncatewords:20 }}</p>
+                <ul class="program-meta">
+                    <li>Type: {{ program.get_program_type_display }}</li>
+                    <li>Duration: {{ program.duration_years }} Year(s)</li>
+                    <li>Fee: ${{ program.tuition_fee|floatformat:2 }}</li>
+                </ul>
+            </div>
+            <div class="program-card-footer">
+                <a href="{% url 'program_detail' program.pk %}" class="btn btn-secondary">View Details</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class_ ="empty-state">
+            <p>No programs found matching your criteria.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

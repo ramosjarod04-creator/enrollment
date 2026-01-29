@@ -1,0 +1,29 @@
+<div class="enrollment-card">
+    <div class="enrollment-header">
+        <h4>{{ enrollment.program.name }}</h4>
+        <span class="badge badge-{{ enrollment.status }}">{{ enrollment.get_status_display }}</span>
+    </div>
+    <div class="enrollment-details">
+        <p><strong>ID:</strong> {{ enrollment.enrollment_id }}</p>
+        {% if user.is_staff %}
+        <p><strong>Student:</strong> {{ enrollment.student.get_full_name }}</p>
+        {% endif %}
+        <p><strong>School Year:</strong> {{ enrollment.school_year }}</p>
+        <p><strong>Year Level:</strong> {{ enrollment.get_year_level_display }}</p>
+        <p><strong>Total Fee:</strong> ₱{{ enrollment.total_fee|floatformat:2 }}</p>
+        {% if enrollment.reviewed_by %}
+        <p><strong>Reviewed by:</strong> {{ enrollment.reviewed_by.username }}</p>
+        {% endif %}
+    </div>
+    <div class="enrollment-actions">
+        {% if user.is_staff and enrollment.status == 'pending' %}
+            <a href="{% url 'enrollment_approve' enrollment.pk %}" class="btn btn-success btn-sm">✅ Approve</a>
+            <a href="{% url 'enrollment_reject' enrollment.pk %}" class="btn btn-danger btn-sm">❌ Reject</a>
+        {% endif %}
+        
+        {% if enrollment.status == 'pending' %}
+            <a href="{% url 'enrollment_update' enrollment.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+            <a href="{% url 'enrollment_delete' enrollment.pk %}" class="btn btn-danger btn-sm">Delete</a>
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,33 @@
+<nav class="navbar">
+    <div class="container">
+        <div class="nav-brand">
+            <h2>🎓 Online Enrollment System</h2>
+            {% if user.is_staff %}
+            <span class="admin-badge">Admin</span>
+            {% endif %}
+        </div>
+        <ul class="nav-menu">
+            <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
+            <li><a href="{% url 'program_list' %}" class="nav-link">Programs</a></li>
+            <li><a href="{% url 'enrollment_list' %}" class="nav-link">Enrollments</a></li>
+            
+            <li>
+                <a href="{% url 'notifications' %}" class="nav-link notification-bell">
+                    🔔
+                    {% if unread_notifications > 0 %}
+                    <span class="notification-badge">{{ unread_notifications }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            
+            {% if user.is_staff %}
+            <li><a href="{% url 'program_create' %}" class="nav-link btn-secondary">+ Add Program</a></li>
+            {% endif %}
+            
+            <li><a href="{% url 'enrollment_create' %}" class="nav-link btn-primary">+ Enroll Now</a></li>
+            
+            <li><a href="{% url 'student_profile' %}" class="nav-link">👤 Profile</a></li>
+            <li><a href="{% url 'logout' %}" class="nav-link">Logout</a></li>
+        </ul>
+    </div>
+</nav>

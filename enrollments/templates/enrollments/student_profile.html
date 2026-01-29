@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>My Profile</h1>
+        {% if student %}
+            <p>Update your personal information below.</p>
+        {% else %}
+            <p>Please complete your profile to continue.</p>
+        {% endif %}
+    </div>
+
+    <div class="form-card large">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if student %}
+            <div class="form-group">
+                <label for="id_view_only">Student ID</label>
+                <input type="text" id="id_view_only" class="form-input" 
+                       value="{{ student.student_id }}" readonly 
+                       style="background-color: #f1f5f9; cursor: not-allowed; font-weight: bold; color: #475569;">
+                <small class="form-help">This is your official system-generated ID.</small>
+            </div>
+            {% endif %}
+
+            {% if student.profile_picture %}
+            <div class="profile-preview">
+                <label>Current Picture</label>
+                <img src="{{ student.profile_picture.url }}" alt="Profile Picture" height="150" style="border-radius: 8px; margin-bottom: 10px;">
+            </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="form-help">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="form-error" style="color: #ef4444; font-size: 0.85rem;">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    {% if student %}Update Profile{% else %}Save Profile{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

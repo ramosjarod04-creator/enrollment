@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Online Enrollment System{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    {% if user.is_authenticated %}
+        {% include 'atomic/organisms/header.html' %}
+    {% endif %}
+
+    {% include 'atomic/organisms/messages.html' %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'atomic/organisms/footer.html' %}
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

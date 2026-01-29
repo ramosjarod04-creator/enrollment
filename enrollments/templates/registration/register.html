@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Student Enrollment{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="registration-card">
+        <div class="form-header">
+            <i class="fas fa-graduation-cap header-icon"></i>
+            <h1>Student Registration</h1>
+            <p>Please provide your academic and personal details</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="modern-form">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <h3 class="section-title">Account Security</h3>
+                <div class="form-grid">
+                    {% for field in form %}
+                    <div class="form-group">
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<small class="error-msg">{{ field.errors.0 }}</small>{% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="form-section">
+                <h3 class="section-title">Personal Information</h3>
+                <div class="form-grid">
+                    {% for field in profile_form %}
+                        {% if field.name != 'student_id' %}
+                        <div class="form-group {% if field.name == 'address' %}full-width{% endif %}">
+                            <label>{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}<small class="error-msg">{{ field.errors.0 }}</small>{% endif %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn-register">Complete Registration</button>
+        </form>
+
+        <div class="form-footer">
+            <p>Already registered? <a href="{% url 'login' %}">Login here</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-wrapper {
+        background: #f8fafc;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 50px 20px;
+    }
+    .registration-card {
+        background: #ffffff;
+        max-width: 850px;
+        width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        padding: 40px;
+    }
+    .form-header { text-align: center; margin-bottom: 30px; }
+    .header-icon { font-size: 2.5rem; color: #2563eb; margin-bottom: 10px; }
+    .section-title { 
+        color: #1e293b; 
+        font-size: 1.1rem; 
+        margin-bottom: 20px; 
+        font-weight: 600;
+        border-left: 4px solid #2563eb;
+        padding-left: 10px;
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .full-width { grid-column: span 2; }
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+    .form-group input:focus {
+        border-color: #2563eb;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .divider { margin: 30px 0; border: 0; border-top: 1px solid #f1f5f9; }
+    .btn-register {
+        width: 100%;
+        background: #2563eb;
+        color: white;
+        padding: 14px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 30px;
+    }
+    .btn-register:hover { background: #1d4ed8; }
+    .error-msg { color: #ef4444; font-size: 0.75rem; margin-top: 4px; }
+    
+    @media (max-width: 640px) {
+        .form-grid { grid-template-columns: 1fr; }
+        .full-width { grid-column: span 1; }
+    }
+</style>
+{% endblock %}

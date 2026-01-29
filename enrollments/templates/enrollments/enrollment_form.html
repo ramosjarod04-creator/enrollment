@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Enrollment{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>{{ action }} Enrollment</h1>
+    </div>
+
+    <div class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="form-help">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            {% if user.is_staff and action == 'Create' %}
+            <div class="form-group checkbox-group">
+                <input type="checkbox" name="auto_approve" id="id_auto_approve" class="form-checkbox">
+                <label for="id_auto_approve">Auto-approve this enrollment (Admin)</label>
+            </div>
+            {% endif %}
+
+            <div class="form-actions">
+                <a href="{% url 'enrollment_list' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">{{ action }} Enrollment</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

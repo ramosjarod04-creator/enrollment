@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Delete Program</h1>
+    </div>
+    
+    <div class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to delete the program: <strong>{{ program.name }} ({{ program.code }})</strong>?</p>
+            <p class="warning-text">This action cannot be undone and may affect enrolled students.</p>
+            
+            <div class="form-actions">
+                <a href="{% url 'program_detail' program.pk %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-danger">Confirm Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>{{ title }}</h1>
+        <a href="{% url 'enrollment_create' %}" class="btn btn-primary">New Enrollment</a>
+    </div>
+
+    <form method="get" class="filter-form card">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id_status">Status</label>
+                <select name="status" id="id_status" class="form-select">
+                    <option value="" {% if not status %}selected{% endif %}>All</option>
+                    <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="approved" {% if status == 'approved' %}selected{% endif %}>Approved</option>
+                    <option value="rejected" {% if status == 'rejected' %}selected{% endif %}>Rejected</option>
+                    <option value="enrolled" {% if status == 'enrolled' %}selected{% endif %}>Enrolled</option>
+                </select>
+            </div>
+            
+            {% if user.is_staff and student %}
+            <div class="form-group">
+                <label for="id_view">View</label>
+                <select name="view" id="id_view" class="form-select">
+                    <option value="all" {% if view_mode == 'all' %}selected{% endif %}>All Enrollments</option>
+                    <option value="my" {% if view_mode == 'my' %}selected{% endif %}>My Enrollments</option>
+                </select>
+            </div>
+            {% endif %}
+        </div>
+        <div class="form-actions">
+            <a href="{% url 'enrollment_list' %}" class="btn btn-secondary">Clear</a>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+
+    <div class="table-container card">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    {% if user.is_staff and view_mode == 'all' %}
+                    <th>Student</th>
+                    {% endif %}
+                    <th>Program</th>
+                    <th>School Year</th>
+                    <th>Year Level</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for enrollment in enrollments %}
+                <tr>
+                    <td>{{ enrollment.enrollment_id }}</td>
+                    {% if user.is_staff and view_mode == 'all' %}
+                    <td>{{ enrollment.student.get_full_name }}</td>
+                    {% endif %}
+                    <td>{{ enrollment.program.code }}</td>
+                    <td>{{ enrollment.school_year }}</td>
+                    <td>{{ enrollment.get_year_level_display }}</td>
+                    <td>
+                        <span class="badge {{ enrollment.status }}">{{ enrollment.get_status_display }}</span>
+                    </td>
+                    <td class="table-actions">
+                        {% if enrollment.status == 'pending' %}
+                            {% if user.is_staff %}
+                                <a href="{% url 'enrollment_approve' enrollment.pk %}" class="btn btn-success btn-sm">Approve</a>
+                                <a href="{% url 'enrollment_reject' enrollment.pk %}" class="btn btn-danger btn-sm">Reject</a>
+                            {% else %}
+                                <a href="{% url 'enrollment_update' enrollment.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+                                <a href="{% url 'enrollment_delete' enrollment.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">No actions</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if user.is_staff and view_mode == 'all' %}7{% else %}6{% endif %}" class="text-center">
+                        No enrollments found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

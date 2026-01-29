@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Notifications</h1>
+        {% if unread_count > 0 %}
+        <a href="{% url 'notifications' %}?mark_read=true" class="btn btn-secondary">Mark All as Read</a>
+        {% endif %}
+    </div>
+
+    <div class="card notifications-list">
+        {% for notification in notifications %}
+        <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
+            <div class="notification-icon {{ notification.notification_type }}">
+                {% if notification.notification_type == 'enrollment_approved' %}✅
+                {% elif notification.notification_type == 'enrollment_rejected' %}❌
+                {% else %}ℹ️
+                {% endif %}
+            </div>
+            <div class="notification-content">
+                <p>{{ notification.message }}</p>
+                <small class="notification-time">{{ notification.created_at|timesince }} ago</small>
+            </div>
+            {% if not notification.is_read %}
+            <a href="{% url 'notification_read' notification.pk %}" class="btn btn-sm btn-secondary" title="Mark as read">Mark Read</a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <p>You have no notifications.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Online Enrollment{% endblock %}
+
+{% block content %}
+<div class="container dashboard">
+    <div class="page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Welcome, {{ user.username }}!
+                {% if is_admin %}
+                <span class="role-badge admin">Administrator</span>
+                {% else %}
+                <span class="role-badge student">Student</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    {% if is_admin %}
+    <!-- Admin Dashboard -->
+    <div class="stats-grid">
+        <div class="stat-card primary">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+                <h3>Total Students</h3>
+                <p class="stat-value">{{ total_students }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card success">
+            <div class="stat-icon">📚</div>
+            <div class="stat-content">
+                <h3>Active Programs</h3>
+                <p class="stat-value">{{ total_programs }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card warning">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-content">
+                <h3>Pending</h3>
+                <p class="stat-value">{{ pending_enrollments }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card info">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+                <h3>Approved</h3>
+                <p class="stat-value">{{ approved_enrollments }}</p>
+            </div>
+        </div>
+    </div>
+
+    {% if recent_enrollments %}
+    <div class="section admin-section">
+        <div class="section-header">
+            <h2>⚠️ Pending Approvals</h2>
+            <a href="{% url 'enrollment_list' %}?status=pending" class="btn btn-warning">View All</a>
+        </div>
+
+        <div class="enrollments-grid">
+            {% for enrollment in recent_enrollments %}
+                {% include 'atomic/molecules/enrollment_card.html' with enrollment=enrollment %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Student Dashboard -->
+    <div class="stats-grid">
+        <div class="stat-card warning">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-content">
+                <h3>Pending</h3>
+                <p class="stat-value">{{ pending_count }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card success">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+                <h3>Approved</h3>
+                <p class="stat-value">{{ approved_count }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card info">
+            <div class="stat-icon">🎓</div>
+            <div class="stat-content">
+                <h3>Enrolled</h3>
+                <p class="stat-value">{{ enrolled_count }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <h2>My Recent Enrollments</h2>
+            <a href="{% url 'enrollment_list' %}" class="btn btn-secondary">View All</a>
+        </div>
+
+        {% if recent_enrollments %}
+        <div class="enrollments-grid">
+            {% for enrollment in recent_enrollments %}
+                {% include 'atomic/molecules/enrollment_card.html' with enrollment=enrollment %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No enrollments yet. <a href="{% url 'enrollment_create' %}">Enroll now</a></p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <h2>Available Programs</h2>
+            <a href="{% url 'program_list' %}" class="btn btn-secondary">View All</a>
+        </div>
+
+        <div class="programs-grid">
+            {% for program in available_programs %}
+                {% include 'atomic/molecules/program_card.html' with program=program %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ program.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <span class="program-code">{{ program.code }}</span>
+            <h1>{{ program.name }}</h1>
+        </div>
+        {% if user.is_staff %}
+        <div class="page-actions">
+            <a href="{% url 'program_update' program.pk %}" class="btn btn-secondary">Edit</a>
+            <a href="{% url 'program_delete' program.pk %}" class="btn btn-danger">Delete</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card detail-card">
+        <h2>Program Details</h2>
+        <ul class="detail-list">
+            <li><strong>Name:</strong> {{ program.name }}</li>
+            <li><strong>Code:</strong> {{ program.code }}</li>
+            <li><strong>Type:</strong> {{ program.get_program_type_display }}</li>
+            <li><strong>Duration:</strong> {{ program.duration_years }} Year(s)</li>
+            <li><strong>Tuition Fee:</strong> ${{ program.tuition_fee|floatformat:2 }}</li>
+            <li><strong>Status:</strong> {% if program.is_active %}Active{% else %}Inactive{% endif %}</li>
+            <li><strong>Enrolled Students:</strong> {{ enrollment_count }}</li>
+        </ul>
+        <h3>Description</h3>
+        <p>{{ program.description|linebreaks }}</p>
+    </div>
+
+    <a href="{% url 'program_list' %}" class="btn btn-secondary">Back to Programs</a>
+</div>
+{% endblock %}
