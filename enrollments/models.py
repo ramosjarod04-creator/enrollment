@@ -5,17 +5,10 @@ from django.utils import timezone
 from django.db import transaction 
 
 class Student(models.Model):
-    GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
-        ('O', 'Other'),
-    ]
-    
+    GENDER_CHOICES = [('M', 'Male'), ('F', 'Female'), ('O', 'Other')]
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
     student_id = models.CharField(max_length=20, unique=True)
-    # NEW: Permanent 6-digit registration code
     registration_code = models.CharField(max_length=6, blank=True, null=True)
-    
     first_name = models.CharField(max_length=100)
     middle_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100)
@@ -40,14 +33,8 @@ class Student(models.Model):
         middle = f"{self.middle_name} " if self.middle_name else ""
         return f"{self.first_name} {middle}{self.last_name}"
 
-
 class Program(models.Model):
-    PROGRAM_TYPES = [
-        ('undergraduate', 'Undergraduate'),
-        ('graduate', 'Graduate'),
-        ('vocational', 'Vocational'),
-    ]
-    
+    PROGRAM_TYPES = [('undergraduate', 'Undergraduate'), ('graduate', 'Graduate'), ('vocational', 'Vocational')]
     code = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=200)
     program_type = models.CharField(max_length=20, choices=PROGRAM_TYPES)
@@ -64,14 +51,8 @@ class Program(models.Model):
     def __str__(self):
         return f"{self.code} - {self.name}"
 
-
 class SchoolYear(models.Model):
-    SEMESTER_CHOICES = [
-        ('1st', '1st Semester'),
-        ('2nd', '2nd Semester'),
-        ('summer', 'Summer'),
-    ]
-    
+    SEMESTER_CHOICES = [('1st', '1st Semester'), ('2nd', '2nd Semester'), ('summer', 'Summer')]
     year_start = models.IntegerField()
     year_end = models.IntegerField()
     semester = models.CharField(max_length=10, choices=SEMESTER_CHOICES)
@@ -87,23 +68,9 @@ class SchoolYear(models.Model):
     def __str__(self):
         return f"SY {self.year_start}-{self.year_end} ({self.get_semester_display()})"
 
-
 class Enrollment(models.Model):
-    STATUS_CHOICES = [
-        ('pending', 'Pending Approval'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-        ('enrolled', 'Enrolled'),
-        ('dropped', 'Dropped'),
-    ]
-    
-    YEAR_LEVEL_CHOICES = [
-        ('1', '1st Year'),
-        ('2', '2nd Year'),
-        ('3', '3rd Year'),
-        ('4', '4th Year'),
-        ('5', '5th Year'),
-    ]
+    STATUS_CHOICES = [('pending', 'Pending Approval'), ('approved', 'Approved'), ('rejected', 'Rejected'), ('enrolled', 'Enrolled'), ('dropped', 'Dropped')]
+    YEAR_LEVEL_CHOICES = [('1', '1st Year'), ('2', '2nd Year'), ('3', '3rd Year'), ('4', '4th Year'), ('5', '5th Year')]
     
     enrollment_id = models.CharField(max_length=20, unique=True, editable=False) 
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='enrollments')
@@ -111,13 +78,10 @@ class Enrollment(models.Model):
     school_year = models.ForeignKey(SchoolYear, on_delete=models.CASCADE, related_name='enrollments')
     year_level = models.CharField(max_length=1, choices=YEAR_LEVEL_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    
     reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_enrollments')
     reviewed_at = models.DateTimeField(null=True, blank=True)
     admin_notes = models.TextField(blank=True, null=True) 
-    
     total_fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True) 
-    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -129,36 +93,20 @@ class Enrollment(models.Model):
         return f"{self.enrollment_id} - {self.student.get_full_name()} - {self.program.code}"
     
     def save(self, *args, **kwargs):
-        # Auto-set tuition fee from program if not provided
         if not self.total_fee and self.program:
             self.total_fee = self.program.tuition_fee
-            
         if not self.enrollment_id:
             with transaction.atomic(): 
                 year = timezone.now().year
-                last_enrollment = Enrollment.objects.filter(
-                    enrollment_id__startswith=f'ENR-{year}'
-                ).order_by('enrollment_id').last()
-                
-                if last_enrollment:
-                    last_id_parts = last_enrollment.enrollment_id.split('-')
-                    new_count = int(last_id_parts[2]) + 1
-                else:
-                    new_count = 1
-                    
+                last_enrollment = Enrollment.objects.filter(enrollment_id__startswith=f'ENR-{year}').order_by('enrollment_id').last()
+                new_count = (int(last_enrollment.enrollment_id.split('-')[2]) + 1) if last_enrollment else 1
                 self.enrollment_id = f'ENR-{year}-{new_count:05d}'
                 super().save(*args, **kwargs)
         else:
             super().save(*args, **kwargs)
 
-
 class Notification(models.Model):
-    NOTIFICATION_TYPES = [
-        ('enrollment_approved', 'Enrollment Approved'),
-        ('enrollment_rejected', 'Enrollment Rejected'),
-        ('enrollment_confirmed', 'Enrollment Confirmed'),
-    ]
-    
+    NOTIFICATION_TYPES = [('enrollment_approved', 'Enrollment Approved'), ('enrollment_rejected', 'Enrollment Rejected'), ('enrollment_confirmed', 'Enrollment Confirmed')]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrollment_notifications')
     notification_type = models.CharField(max_length=30, choices=NOTIFICATION_TYPES)
     enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='notifications')
@@ -168,6 +116,3 @@ class Notification(models.Model):
     
     class Meta:
         ordering = ['-created_at']
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.notification_type}"
