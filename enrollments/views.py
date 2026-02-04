@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Q
-from .models import Student, Program, Enrollment, Notification
+# Added SchoolYear to the imports below
+from .models import Student, Program, Enrollment, Notification, SchoolYear 
 from .forms import RegisterForm, StudentProfileForm, EnrollmentForm, ProgramForm
 
 # ============================================
@@ -76,7 +77,7 @@ def logout_view(request):
     return redirect('login')
 
 # ============================================
-# DASHBOARD (Updated with 3-card vs 4-card logic)
+# DASHBOARD
 # ============================================
 
 @login_required
@@ -95,13 +96,8 @@ def dashboard_view(request):
             'display_courses': all_programs,
         }
     else:
-        # STUDENT LOGIC
         my_enrollments = Enrollment.objects.filter(student=student) if student else Enrollment.objects.none()
-        
-        # 1. Courses they are already officially in
         enrolled_courses = my_enrollments.filter(status='enrolled')
-        
-        # 2. Programs they HAVEN'T applied for yet (Available Courses)
         applied_program_ids = my_enrollments.values_list('program_id', flat=True)
         available_programs = Program.objects.filter(is_active=True).exclude(id__in=applied_program_ids)
         
@@ -111,8 +107,8 @@ def dashboard_view(request):
             'pending_count': my_enrollments.filter(status='pending').count(),
             'approved_count': my_enrollments.filter(status='approved').count(),
             'enrolled_count': enrolled_courses.count(),
-            'display_courses': enrolled_courses, # This shows CURRENT courses
-            'available_courses': available_programs, # This shows NEW courses
+            'display_courses': enrolled_courses,
+            'available_courses': available_programs,
             'recent_applications': my_enrollments.filter(status='pending').order_by('-created_at')[:2],
             'reg_code': student.registration_code if student else None,
         }
@@ -175,7 +171,7 @@ def program_delete_view(request, pk):
     return render(request, 'enrollments/program_confirm_delete.html', {'program': program})
 
 # ============================================
-# ENROLLMENT MANAGEMENT
+# ENROLLMENT MANAGEMENT (FIXED LINE 196)
 # ============================================
 
 @login_required
@@ -193,11 +189,15 @@ def enrollment_create_view(request):
                 messages.warning(request, 'Application already exists.')
                 return redirect('dashboard')
 
+            # FIX: Fetch the SchoolYear object instead of using a string
+            # This ensures we pass an instance, satisfying the ForeignKey requirement
+            school_year_obj, created = SchoolYear.objects.get_or_create(year_name="2025-2026")
+
             Enrollment.objects.create(
                 student=student, 
                 program=program, 
                 status='pending', 
-                school_year="2025-2026"
+                school_year=school_year_obj # Used the object instance here
             )
             messages.success(request, 'Enrollment submitted!')
             return redirect('dashboard')
@@ -251,7 +251,6 @@ def enrollment_approve_view(request, pk):
         enrollment.status = 'approved'
         enrollment.reviewed_by = request.user
         enrollment.reviewed_at = timezone.now()
-        # Capture the notes from the textarea
         enrollment.admin_notes = request.POST.get('admin_notes', '') 
         enrollment.save()
         
@@ -265,7 +264,7 @@ def enrollment_approve_view(request, pk):
         
     return render(request, 'enrollments/enrollment_approve.html', {
         'enrollment': enrollment,
-        'is_approve': True  # This triggers the green styling
+        'is_approve': True
     })
 
 @login_required
@@ -288,10 +287,11 @@ def enrollment_reject_view(request, pk):
         messages.warning(request, 'Enrollment rejected.')
         return redirect('dashboard')
         
-    return render(request, 'enrollments/enrollment_approve.html', { # Using same template
+    return render(request, 'enrollments/enrollment_approve.html', {
         'enrollment': enrollment,
-        'is_approve': False # This triggers the red styling
+        'is_approve': False
     })
+
 # ============================================
 # NOTIFICATIONS & PROFILE
 # ============================================
