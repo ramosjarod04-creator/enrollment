@@ -1,55 +1,120 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div style="background: linear-gradient(90deg, #0a1969 0%, #1e40af 100%); color: white; padding: 40px; border-radius: 30px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
-    <div>
-        <h1 style="margin: 0; font-size: 2.2rem; font-weight: 800;">{{ program.name }}</h1>
-        <p style="margin: 5px 0 0 0; opacity: 0.8;">Program Code: {{ program.code }}</p>
-    </div>
+<div class="detail-container" style="font-family: 'Segoe UI', Arial, sans-serif; padding-right: 20px; box-sizing: border-box;">
     
-    <div style="display: flex; gap: 10px;">
-        {% if user.is_staff %}
-            <a href="{% url 'program_update' program.pk %}" style="background: white; color: #0a1969; padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: 800;">Edit</a>
-        {% endif %}
+    <div class="header-card">
+        <div class="header-text">
+            <h1 class="header-title">{{ program.name }}</h1>
+            <p class="header-subtitle">Program Code: {{ program.code }}</p>
+        </div>
+        
+        <div class="header-actions">
+            {% if user.is_staff %}
+                <a href="{% url 'program_update' program.pk %}" class="btn-edit">Edit</a>
+            {% endif %}
 
-        {% if not user.is_staff %}
-            <a href="{% url 'program_list' %}" style="background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: 700; border: 1px solid white;">Back to Courses</a>
-        {% endif %}
+            {% if not user.is_staff %}
+                <a href="{% url 'program_list' %}" class="btn-back">Back to Courses</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="description-card">
+            <h2 class="section-title">Description</h2>
+            <p class="section-body">{{ program.description }}</p>
+        </div>
+
+        <div class="info-card">
+            <div class="info-top">
+                <h2 class="section-title" style="margin-bottom: 25px;">Information</h2>
+                <div style="margin-bottom: 20px;">
+                    <small class="info-label">Tuition Fee</small>
+                    <p class="info-value-primary">₱{{ program.tuition_fee|floatformat:2 }}</p>
+                </div>
+                <div style="margin-bottom: 30px;">
+                    <small class="info-label">Duration</small>
+                    <p class="info-value-secondary">{{ program.duration_years }} Year(s)</p>
+                </div>
+            </div>
+
+            {% if not user.is_staff %}
+            <div class="enrollment-footer">
+                <form action="{% url 'enrollment_create' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="program" value="{{ program.id }}">
+                    <button type="submit" class="btn-enroll">
+                        Enroll Now
+                    </button>
+                </form>
+                <p class="disclaimer">
+                    Clicking will submit a pending application.
+                </p>
+            </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
-    <div style="background: white; padding: 40px; border-radius: 30px; border: 1px solid #e2e8f0;">
-        <h2 style="color: #0a1969; font-weight: 800;">Description</h2>
-        <p style="line-height: 1.6; color: #475569;">{{ program.description }}</p>
-    </div>
+<style>
+    /* Desktop First Styles */
+    .header-card {
+        background: linear-gradient(90deg, #0a1969 0%, #1e40af 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 30px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(10, 25, 105, 0.1);
+    }
+    .header-title { margin: 0; font-size: 2.2rem; font-weight: 800; }
+    .header-subtitle { margin: 5px 0 0 0; opacity: 0.8; }
+    
+    .btn-edit { background: white; color: #0a1969; padding: 10px 25px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block; }
+    .btn-back { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: 700; border: 1px solid white; display: inline-block; }
 
-    <div style="background: #eef2ff; padding: 40px; border-radius: 30px; border: 1.5px solid #c7d2fe; display: flex; flex-direction: column; justify-content: space-between;">
-        <div>
-            <h2 style="color: #0a1969; font-weight: 800; margin-bottom: 25px;">Information</h2>
-            <div style="margin-bottom: 20px;">
-                <small style="color: #64748b; font-weight: 700; text-transform: uppercase;">Tuition Fee</small>
-                <p style="font-size: 1.5rem; font-weight: 800; color: #1e40af; margin: 5px 0;">₱{{ program.tuition_fee|floatformat:2 }}</p>
-            </div>
-            <div style="margin-bottom: 30px;">
-                <small style="color: #64748b; font-weight: 700; text-transform: uppercase;">Duration</small>
-                <p style="font-size: 1.1rem; font-weight: 800; color: #1e293b; margin: 5px 0;">{{ program.duration_years }} Year(s)</p>
-            </div>
-        </div>
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+        margin-bottom: 50px;
+    }
 
-        {% if not user.is_staff %}
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #c7d2fe;">
-            <form action="{% url 'enrollment_create' %}" method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="program" value="{{ program.id }}">
-                <button type="submit" style="width: 100%; background: #0a1969; color: white; padding: 15px; border-radius: 15px; border: none; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: 0.3s;">
-                    Enroll Now
-                </button>
-            </form>
-            <p style="font-size: 0.8rem; color: #64748b; text-align: center; margin-top: 10px;">
-                Clicking will submit a pending application.
-            </p>
-        </div>
-        {% endif %}
-    </div>
-</div>
+    .description-card { background: white; padding: 40px; border-radius: 30px; border: 1px solid #e2e8f0; }
+    .info-card { background: #eef2ff; padding: 40px; border-radius: 30px; border: 1.5px solid #c7d2fe; display: flex; flex-direction: column; justify-content: space-between; }
+    
+    .section-title { color: #0a1969; font-weight: 800; margin-top: 0; }
+    .section-body { line-height: 1.6; color: #475569; }
+    .info-label { color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value-primary { font-size: 1.8rem; font-weight: 800; color: #1e40af; margin: 5px 0; }
+    .info-value-secondary { font-size: 1.2rem; font-weight: 800; color: #1e293b; margin: 5px 0; }
+    
+    .enrollment-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #c7d2fe; }
+    .btn-enroll { width: 100%; background: #0a1969; color: white; padding: 16px; border-radius: 15px; border: none; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
+    .btn-enroll:hover { background: #1e40af; transform: translateY(-2px); }
+    .disclaimer { font-size: 0.85rem; color: #64748b; text-align: center; margin-top: 12px; }
+
+    /* Mobile Responsive Logic */
+    @media (max-width: 992px) {
+        .content-grid {
+            grid-template-columns: 1fr; /* Stacks column on tablet/mobile */
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header-card {
+            flex-direction: column;
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 20px;
+        }
+        .header-actions { margin-top: 20px; width: 100%; display: flex; flex-direction: column; gap: 10px; }
+        .header-title { font-size: 1.6rem; }
+        .description-card, .info-card { padding: 25px; border-radius: 20px; }
+        .detail-container { padding-right: 0 !important; } /* Removes desktop sidebar offset */
+    }
+</style>
 {% endblock %}
