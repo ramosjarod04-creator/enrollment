@@ -1,35 +1,68 @@
 {% extends 'base.html' %}
 
-{% block title %}Reject Enrollment{% endblock %}
-
 {% block content %}
-<div class="container">
-    <div class="page-header">
-        <h1>Reject Enrollment</h1>
-    </div>
+<style>
+    /* Styling for the Rejection theme */
+    .reject-container { max-width: 600px; margin: 0 auto; font-family: 'Segoe UI', Arial, sans-serif; }
+    .reject-card { background: white; border-radius: 30px; border: 1px solid #f1f5f9; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
     
-    <div class="form-card">
-        <h3>Enrollment Details</h3>
-        <ul class="detail-list">
-            <li><strong>Student:</strong> {{ enrollment.student.get_full_name }}</li>
-            <li><strong>Program:</strong> {{ enrollment.program.name }}</li>
-            <li><strong>School Year:</strong> {{ enrollment.school_year }}</li>
-            <li><strong>Year Level:</strong> {{ enrollment.get_year_level_display }}</li>
-        </ul>
+    /* Rejection Red Header */
+    .reject-header { background: #fef2f2; padding: 30px; text-align: center; }
+    .reject-title { margin: 0; color: #991b1b; font-size: 1.5rem; font-weight: 800; }
 
-        <form method="post">
-            {% csrf_token %}
+    /* Details Section */
+    .details-box { background: #f8fafc; border-radius: 20px; padding: 20px; margin-bottom: 30px; }
+    .detail-item { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .detail-label { color: #64748b; font-weight: 600; }
+    .detail-value { font-weight: 800; color: #0a1969; }
+
+    /* Form Elements */
+    .admin-textarea { width: 100%; padding: 15px; border-radius: 15px; border: 1.5px solid #e2e8f0; font-family: 'Inter', sans-serif; resize: none; }
+    .btn-group { display: flex; gap: 12px; }
+    .btn-confirm-reject { flex: 2; background: #991b1b; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; transition: opacity 0.2s; }
+    .btn-cancel { flex: 1; text-align: center; background: #f1f5f9; color: #64748b; padding: 15px; border-radius: 15px; text-decoration: none; font-weight: 800; }
+    .btn-confirm-reject:hover { opacity: 0.9; }
+</style>
+
+<div class="reject-container">
+    <div class="reject-card">
+        <div class="reject-header">
+            <h1 class="reject-title">Reject Enrollment</h1>
+        </div>
+
+        <div style="padding: 30px;">
+            <h3 style="font-size: 0.8rem; text-transform: uppercase; color: #64748b; margin-bottom: 20px; letter-spacing: 1px;">Enrollment Details</h3>
             
-            <div class="form-group">
-                <label for="id_admin_notes">Reason for Rejection (Required)</label>
-                <textarea name="admin_notes" id="id_admin_notes" class="form-input" rows="4" required placeholder="e.g., 'Missing required documents. Please re-apply.'"></textarea>
+            <div class="details-box">
+                <div class="detail-item">
+                    <span class="detail-label">Student:</span>
+                    <span class="detail-value">{{ enrollment.student.user.get_full_name|default:enrollment.student.user.username }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Program:</span>
+                    <span class="detail-value">{{ enrollment.program.name }}</span>
+                </div>
+                <div class="detail-item" style="margin-bottom: 0;">
+                    <span class="detail-label">Year Level:</span>
+                    <span class="detail-value">{{ enrollment.get_year_level_display }}</span>
+                </div>
             </div>
-            
-            <div class="form-actions">
-                <a href="{% url 'enrollment_list' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-danger">Confirm Rejection</button>
-            </div>
-        </form>
+
+            <form method="post">
+                {% csrf_token %}
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 8px;">Reason for Rejection</label>
+                    <textarea name="admin_notes" rows="4" class="admin-textarea" placeholder="Provide a reason so the student knows why..."></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn-confirm-reject">
+                        Confirm Rejection
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

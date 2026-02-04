@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
-from django.db import transaction # Added for safe ID generation
+from django.db import transaction 
 
 class Student(models.Model):
     GENDER_CHOICES = [
@@ -13,6 +13,9 @@ class Student(models.Model):
     
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
     student_id = models.CharField(max_length=20, unique=True)
+    # NEW: Permanent 6-digit registration code
+    registration_code = models.CharField(max_length=6, blank=True, null=True)
+    
     first_name = models.CharField(max_length=100)
     middle_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100)
@@ -102,7 +105,7 @@ class Enrollment(models.Model):
         ('5', '5th Year'),
     ]
     
-    enrollment_id = models.CharField(max_length=20, unique=True, editable=False) # Editable=False keeps it safe from forms
+    enrollment_id = models.CharField(max_length=20, unique=True, editable=False) 
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='enrollments')
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='enrollments')
     school_year = models.ForeignKey(SchoolYear, on_delete=models.CASCADE, related_name='enrollments')
@@ -111,16 +114,15 @@ class Enrollment(models.Model):
     
     reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_enrollments')
     reviewed_at = models.DateTimeField(null=True, blank=True)
-    admin_notes = models.TextField(blank=True, null=True) # Added null=True for database flexibility
+    admin_notes = models.TextField(blank=True, null=True) 
     
-    total_fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True) # Allowed blank so it can auto-populate
+    total_fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True) 
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         ordering = ['-created_at']
-        # Prevent double enrollment in same SY/Semester
         unique_together = ['student', 'program', 'school_year']
 
     def __str__(self):
@@ -132,9 +134,8 @@ class Enrollment(models.Model):
             self.total_fee = self.program.tuition_fee
             
         if not self.enrollment_id:
-            with transaction.atomic(): # Ensure thread safety
+            with transaction.atomic(): 
                 year = timezone.now().year
-                # Get the highest current count for this year to avoid collisions
                 last_enrollment = Enrollment.objects.filter(
                     enrollment_id__startswith=f'ENR-{year}'
                 ).order_by('enrollment_id').last()

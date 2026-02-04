@@ -3,33 +3,72 @@
 {% block title %}{{ action }} Program{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="page-header">
-        <h1>{{ action }} Program</h1>
+<div style="width: 100%; padding: 0 40px 40px 0;">
+    
+    <div style="background: linear-gradient(90deg, #0a1969 0%, #1e40af 100%); color: white; padding: 35px 50px; border-radius: 30px; margin-bottom: 25px; box-shadow: 0 10px 20px rgba(10, 25, 105, 0.1);">
+        <h1 style="margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px;">{{ action }} Program</h1>
+        <p style="margin: 3px 0 0 0; opacity: 0.8; font-size: 0.95rem;">
+            Please provide the program details below to update the system.
+        </p>
     </div>
 
-    <div class="form-card large">
-        <form method="post">
-            {% csrf_token %}
+    <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        
+        <div style="width: 100%; max-width: 600px;">
+            <h2 style="font-size: 1.1rem; margin-bottom: 12px; color: #1e293b; font-weight: 800; text-align: left; padding-left: 5px;">Program Details</h2>
             
-            {% for field in form %}
-                <div class="form-group">
-                    {{ field.label_tag }}
-                    {{ field }}
-                    {% if field.help_text %}
-                        <small class="form-help">{{ field.help_text }}</small>
-                    {% endif %}
-                    {% for error in field.errors %}
-                        <p class="form-error">{{ error }}</p>
+            <div style="background: white; padding: 20px 40px; border-radius: 30px; border: 1.5px solid #f1f5f9; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div style="margin-bottom: 8px;">
+                        <label style="display: block; font-weight: 800; color: #0a1969; margin-bottom: 3px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                            {{ field.label }}
+                        </label>
+                        <div class="custom-field">
+                            {{ field }}
+                        </div>
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <p style="color: #ef4444; font-size: 0.65rem; margin-top: 2px; font-weight: 700;">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                     {% endfor %}
-                </div>
-            {% endfor %}
 
-            <div class="form-actions">
-                <a href="{% url 'program_list' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">{{ action }} Program</button>
+                    <div style="display: flex; gap: 12px; margin-top: 15px;">
+                        <button type="submit" style="flex: 2; background: #0a1969; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.9rem;">
+                            Save Program
+                        </button>
+                        <a href="{% url 'program_list' %}" style="flex: 1; text-align: center; background: #f1f5f9; color: #64748b; padding: 10px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 0.9rem; border: 1.5px solid #e2e8f0;">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
+
+<style>
+    /* REDUCED: Padding from 8px to 6px to make inputs shorter */
+    input, select, textarea { 
+        width: 100%; 
+        padding: 6px 15px; 
+        border-radius: 10px; 
+        border: 1.5px solid #eef2ff; 
+        font-family: 'Inter', sans-serif; 
+        font-size: 0.85rem;
+        background-color: #fcfdfe;
+        box-sizing: border-box;
+    }
+    input:focus, select:focus, textarea:focus { 
+        border-color: #1e40af; 
+        outline: none; 
+        background-color: #fff;
+    }
+    /* REDUCED: Textarea height from 70px to 45px */
+    textarea { height: 45px; resize: none; }
+    input[type="checkbox"] { width: auto; margin-right: 10px; cursor: pointer; }
+</style>
 {% endblock %}

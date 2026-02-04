@@ -1,42 +1,38 @@
 {% extends 'base.html' %}
-
-{% block title %}{{ action }} Enrollment{% endblock %}
-
 {% block content %}
-<div class="container">
-    <div class="page-header">
-        <h1>{{ action }} Enrollment</h1>
+<div style="max-width: 550px; margin: 0 auto; padding: 10px;">
+    <div style="text-align: center; margin-bottom: 25px;">
+        <h1 style="font-size: 1.8rem; font-weight: 800; color: #0a1969; margin: 0;">{{ action }} Enrollment</h1>
     </div>
 
-    <div class="form-card">
+    <div style="background: white; padding: 30px; border-radius: 25px; border: 1px solid #f1f5f9; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
         <form method="post">
             {% csrf_token %}
-            
             {% for field in form %}
-                <div class="form-group">
-                    {{ field.label_tag }}
-                    {{ field }}
-                    {% if field.help_text %}
-                        <small class="form-help">{{ field.help_text }}</small>
-                    {% endif %}
-                    {% for error in field.errors %}
-                        <p class="form-error">{{ error }}</p>
-                    {% endfor %}
-                </div>
+            <div style="margin-bottom: 18px;">
+                <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 8px; font-size: 0.85rem;">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<small style="color: #64748b; font-size: 0.75rem;">{{ field.help_text }}</small>{% endif %}
+            </div>
             {% endfor %}
 
             {% if user.is_staff and action == 'Create' %}
-            <div class="form-group checkbox-group">
-                <input type="checkbox" name="auto_approve" id="id_auto_approve" class="form-checkbox">
-                <label for="id_auto_approve">Auto-approve this enrollment (Admin)</label>
+            <div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 20px;">
+                <input type="checkbox" name="auto_approve" id="id_auto_approve" style="width: 18px; height: 18px;">
+                <label for="id_auto_approve" style="font-size: 0.85rem; font-weight: 700; color: #1e293b;">Auto-approve this enrollment</label>
             </div>
             {% endif %}
 
-            <div class="form-actions">
-                <a href="{% url 'enrollment_list' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">{{ action }} Enrollment</button>
+            <div style="display: flex; gap: 12px; margin-top: 30px;">
+                <button type="submit" style="flex: 2; background: #0a1969; color: white; border: none; padding: 14px; border-radius: 15px; font-weight: 800; cursor: pointer;">{{ action }} Enrollment</button>
+                <a href="{% url 'enrollment_list' %}" style="flex: 1; text-align: center; background: #f1f5f9; color: #64748b; padding: 14px; border-radius: 15px; text-decoration: none; font-weight: 800; font-size: 0.9rem;">Cancel</a>
             </div>
         </form>
     </div>
 </div>
+
+<style>
+    input, select, textarea { width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-family: 'Inter'; box-sizing: border-box; font-size: 0.9rem; }
+    input:focus, select:focus { border-color: #1e40af; outline: none; }
+</style>
 {% endblock %}

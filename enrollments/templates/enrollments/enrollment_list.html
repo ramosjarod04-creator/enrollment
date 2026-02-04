@@ -1,94 +1,182 @@
 {% extends 'base.html' %}
-
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="page-header">
-        <h1>{{ title }}</h1>
-        <a href="{% url 'enrollment_create' %}" class="btn btn-primary">New Enrollment</a>
+<style>
+    /* Desktop-first styling adjustments */
+    .header-gradient {
+        background: linear-gradient(90deg, #0a1969 0%, #1e40af 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 30px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .filter-form {
+        background: white;
+        padding: 20px 30px;
+        border-radius: 20px;
+        border: 1px solid #f1f5f9;
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .header-gradient {
+            padding: 25px;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .filter-form {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 20px;
+        }
+
+        .filter-form > div {
+            width: 100%;
+        }
+
+        /* Table to Card Transformation */
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+        thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        tr {
+            margin-bottom: 15px;
+            border: 1px solid #f1f5f9 !important;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        td {
+            border: none;
+            position: relative;
+            padding-left: 45% !important;
+            text-align: right !important;
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        td:before {
+            position: absolute;
+            top: 18px;
+            left: 20px;
+            width: 40%;
+            padding-right: 10px;
+            white-space: nowrap;
+            content: attr(data-label);
+            text-align: left;
+            font-weight: 800;
+            color: #64748b;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        td:last-child {
+            text-align: center !important;
+            padding-left: 20px !important;
+            background: #f8fafc;
+        }
+
+        td:last-child:before {
+            display: none;
+        }
+    }
+</style>
+
+<div class="header-gradient">
+    <h1 style="margin: 0; font-size: 2rem; font-weight: 800;">{{ title }}</h1>
+    <a href="{% url 'enrollment_create' %}" style="background: white; color: #0a1969; padding: 12px 25px; border-radius: 15px; text-decoration: none; font-weight: 800; font-size: 0.9rem;">+ New Enrollment</a>
+</div>
+
+<form method="get" class="filter-form">
+    <div style="flex: 1;">
+        <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 8px; font-size: 0.85rem;">Status</label>
+        <select name="status" style="width: 100%; padding: 10px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-family: 'Inter';">
+            <option value="" {% if not status %}selected{% endif %}>All Statuses</option>
+            <option value="pending" {% if status == 'pending' %}selected{% endif %}>⌛ Pending</option>
+            <option value="approved" {% if status == 'approved' %}selected{% endif %}>✔️ Approved</option>
+            <option value="rejected" {% if status == 'rejected' %}selected{% endif %}>❌ Rejected</option>
+        </select>
     </div>
+    
+    <div style="display: flex; gap: 10px;">
+        <button type="submit" style="background: #0a1969; color: white; border: none; padding: 10px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; flex: 1;">Filter</button>
+        <a href="{% url 'enrollment_list' %}" style="background: #f1f5f9; color: #64748b; padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 0.9rem; text-align: center; flex: 1;">Clear</a>
+    </div>
+</form>
 
-    <form method="get" class="filter-form card">
-        <div class="form-row">
-            <div class="form-group">
-                <label for="id_status">Status</label>
-                <select name="status" id="id_status" class="form-select">
-                    <option value="" {% if not status %}selected{% endif %}>All</option>
-                    <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
-                    <option value="approved" {% if status == 'approved' %}selected{% endif %}>Approved</option>
-                    <option value="rejected" {% if status == 'rejected' %}selected{% endif %}>Rejected</option>
-                    <option value="enrolled" {% if status == 'enrolled' %}selected{% endif %}>Enrolled</option>
-                </select>
-            </div>
-            
-            {% if user.is_staff and student %}
-            <div class="form-group">
-                <label for="id_view">View</label>
-                <select name="view" id="id_view" class="form-select">
-                    <option value="all" {% if view_mode == 'all' %}selected{% endif %}>All Enrollments</option>
-                    <option value="my" {% if view_mode == 'my' %}selected{% endif %}>My Enrollments</option>
-                </select>
-            </div>
-            {% endif %}
-        </div>
-        <div class="form-actions">
-            <a href="{% url 'enrollment_list' %}" class="btn btn-secondary">Clear</a>
-            <button type="submit" class="btn btn-primary">Filter</button>
-        </div>
-    </form>
-
-    <div class="table-container card">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    {% if user.is_staff and view_mode == 'all' %}
-                    <th>Student</th>
+<div style="background: white; border-radius: 30px; border: 1px solid #f1f5f9; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="background: #f8fafc; border-bottom: 2px solid #f1f5f9;">
+                <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">ID</th>
+                {% if user.is_staff and view_mode == 'all' %}
+                <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Student</th>
+                {% endif %}
+                <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Program</th>
+                <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Year Level</th>
+                <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Status</th>
+                <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; text-align: center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enrollment in enrollments %}
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td data-label="ID" style="padding: 18px 20px; font-weight: 700; color: #0a1969;">#{{ enrollment.enrollment_id }}</td>
+                {% if user.is_staff and view_mode == 'all' %}
+                <td data-label="Student" style="padding: 18px 20px; font-weight: 600;">{{ enrollment.student.get_full_name }}</td>
+                {% endif %}
+                <td data-label="Program" style="padding: 18px 20px;">
+                    <span style="background: #eef2ff; color: #1e40af; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700;">{{ enrollment.program.code }}</span>
+                </td>
+                <td data-label="Year Level" style="padding: 18px 20px; color: #475569;">{{ enrollment.get_year_level_display }}</td>
+                <td data-label="Status" style="padding: 18px 20px;">
+                    {% if enrollment.status == 'pending' %}
+                        <span style="background: #fffbeb; color: #92400e; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800;">⌛ PENDING</span>
+                    {% elif enrollment.status == 'approved' %}
+                        <span style="background: #f0fdf4; color: #166534; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800;">✔️ APPROVED</span>
+                    {% else %}
+                        <span style="background: #fef2f2; color: #991b1b; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800;">❌ REJECTED</span>
                     {% endif %}
-                    <th>Program</th>
-                    <th>School Year</th>
-                    <th>Year Level</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for enrollment in enrollments %}
-                <tr>
-                    <td>{{ enrollment.enrollment_id }}</td>
-                    {% if user.is_staff and view_mode == 'all' %}
-                    <td>{{ enrollment.student.get_full_name }}</td>
-                    {% endif %}
-                    <td>{{ enrollment.program.code }}</td>
-                    <td>{{ enrollment.school_year }}</td>
-                    <td>{{ enrollment.get_year_level_display }}</td>
-                    <td>
-                        <span class="badge {{ enrollment.status }}">{{ enrollment.get_status_display }}</span>
-                    </td>
-                    <td class="table-actions">
-                        {% if enrollment.status == 'pending' %}
-                            {% if user.is_staff %}
-                                <a href="{% url 'enrollment_approve' enrollment.pk %}" class="btn btn-success btn-sm">Approve</a>
-                                <a href="{% url 'enrollment_reject' enrollment.pk %}" class="btn btn-danger btn-sm">Reject</a>
-                            {% else %}
-                                <a href="{% url 'enrollment_update' enrollment.pk %}" class="btn btn-secondary btn-sm">Edit</a>
-                                <a href="{% url 'enrollment_delete' enrollment.pk %}" class="btn btn-danger btn-sm">Delete</a>
-                            {% endif %}
+                </td>
+                <td style="padding: 18px 20px; text-align: center;">
+                    {% if enrollment.status == 'pending' %}
+                        {% if user.is_staff %}
+                            <a href="{% url 'enrollment_approve' enrollment.pk %}" style="color: #166534; text-decoration: none; font-weight: 800; font-size: 0.85rem; margin-right: 15px;">Approve</a>
+                            <a href="{% url 'enrollment_reject' enrollment.pk %}" style="color: #991b1b; text-decoration: none; font-weight: 800; font-size: 0.85rem;">Reject</a>
                         {% else %}
-                            <span class="text-muted">No actions</span>
+                            <a href="{% url 'enrollment_update' enrollment.pk %}" style="color: #1e40af; text-decoration: none; font-weight: 800; font-size: 0.85rem; margin-right: 15px;">Edit</a>
+                            <a href="{% url 'enrollment_delete' enrollment.pk %}" style="color: #991b1b; text-decoration: none; font-weight: 800; font-size: 0.85rem;">Delete</a>
                         {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="{% if user.is_staff and view_mode == 'all' %}7{% else %}6{% endif %}" class="text-center">
-                        No enrollments found.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                    {% else %}
+                        <span style="color: #cbd5e1; font-size: 0.8rem; font-weight: 600;">No actions</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="padding: 50px; text-align: center; color: #94a3b8; font-weight: 600;">No enrollments found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

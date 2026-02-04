@@ -1,22 +1,18 @@
 {% extends 'base.html' %}
-
-{% block title %}Confirm Delete{% endblock %}
-
 {% block content %}
-<div class="container">
-    <div class="page-header">
-        <h1>Delete Enrollment</h1>
-    </div>
-    
-    <div class="form-card">
+<div style="max-width: 500px; margin: 50px auto; text-align: center;">
+    <div style="background: white; padding: 40px; border-radius: 35px; border: 1px solid #f1f5f9; box-shadow: 0 20px 40px rgba(0,0,0,0.05);">
+        <div style="font-size: 50px; margin-bottom: 20px;">⚠️</div>
+        <h1 style="color: #0a1969; font-weight: 800; font-size: 1.5rem; margin-bottom: 15px;">Delete Enrollment?</h1>
+        <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px;">
+            Are you sure you want to delete application <strong>#{{ enrollment.enrollment_id }}</strong>? This action is permanent.
+        </p>
+        
         <form method="post">
             {% csrf_token %}
-            <p>Are you sure you want to delete your enrollment application (<strong>{{ enrollment.enrollment_id }}</strong>) for <strong>{{ enrollment.program.name }}</strong>?</p>
-            <p class="warning-text">This action cannot be undone.</p>
-            
-            <div class="form-actions">
-                <a href="{% url 'enrollment_list' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-danger">Confirm Delete</button>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button type="submit" style="background: #ef4444; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer;">Yes, Confirm Delete</button>
+                <a href="{% url 'enrollment_list' %}" style="background: #f1f5f9; color: #64748b; padding: 15px; border-radius: 15px; text-decoration: none; font-weight: 800;">No, Go Back</a>
             </div>
         </form>
     </div>

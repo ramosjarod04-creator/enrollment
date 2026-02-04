@@ -3,31 +3,38 @@
 {% block title %}Login - Online Enrollment{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <h1>🎓 Welcome Back</h1>
-            <p>Login to access the enrollment system</p>
+<div style="min-height: 85vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: #f8fafc;">
+    <div style="background: white; width: 100%; max-width: 450px; border-radius: 30px; border: 1.5px solid #f1f5f9; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden;">
+        
+        <div style="background: linear-gradient(90deg, #0a1969 0%, #1e40af 100%); color: white; padding: 40px 20px; text-align: center;">
+            <h1 style="margin: 0; font-size: clamp(1.5rem, 5vw, 1.8rem); font-weight: 800; letter-spacing: -0.5px;">Welcome Back</h1>
+            <p style="margin: 5px 0 0 0; opacity: 0.8; font-size: 0.9rem;">Login to access the enrollment system</p>
         </div>
 
-        <form method="post" class="auth-form">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" id="username" name="username" class="form-input" required autofocus>
+        <div style="padding: 30px 25px;">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 800; color: #0a1969; margin-bottom: 6px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Username</label>
+                    <input type="text" name="username" style="width: 100%; padding: 12px 0px; border-radius: 12px; border: 1.5px solid #eef2ff; background: #fcfdfe; font-family: 'Inter', sans-serif; box-sizing: border-box;" required autofocus>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-weight: 800; color: #0a1969; margin-bottom: 6px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Password</label>
+                    <input type="password" name="password" style="width: 100%; padding: 12px 0px; border-radius: 12px; border: 1.5px solid #eef2ff; background: #fcfdfe; font-family: 'Inter', sans-serif; box-sizing: border-box;" required>
+                </div>
+
+                <button type="submit" style="width: 100%; background: #0a1969; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1rem; transition: 0.3s;">
+                    Login to Dashboard
+                </button>
+            </form>
+
+            <div style="margin-top: 25px; text-align: center;">
+                <p style="color: #64748b; font-size: 0.85rem; font-weight: 600;">
+                    Don't have an account? <a href="{% url 'register' %}" style="color: #1e40af; text-decoration: none; font-weight: 800;">Register here</a>
+                </p>
             </div>
-
-            <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" name="password" class="form-input" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
-        </form>
-
-        <div class="auth-footer">
-            <p>Don't have an account? <a href="{% url 'register' %}" class="link">Register here</a></p>
         </div>
     </div>
 </div>

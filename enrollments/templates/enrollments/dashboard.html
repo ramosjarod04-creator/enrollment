@@ -1,132 +1,177 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard - Online Enrollment{% endblock %}
-
 {% block content %}
-<div class="container dashboard">
-    <div class="page-header">
-        <div>
-            <h1>Dashboard</h1>
-            <p>Welcome, {{ user.username }}!
-                {% if is_admin %}
-                <span class="role-badge admin">Administrator</span>
-                {% else %}
-                <span class="role-badge student">Student</span>
-                {% endif %}
-            </p>
-        </div>
-    </div>
+<div class="dashboard-container" style="font-family: 'Segoe UI', Arial, sans-serif; background-color: #ffffff; min-height: 100vh; padding-right: 40px; box-sizing: border-box;">
 
-    {% if is_admin %}
-    <!-- Admin Dashboard -->
-    <div class="stats-grid">
-        <div class="stat-card primary">
-            <div class="stat-icon">👥</div>
-            <div class="stat-content">
-                <h3>Total Students</h3>
-                <p class="stat-value">{{ total_students }}</p>
-            </div>
-        </div>
-
-        <div class="stat-card success">
-            <div class="stat-icon">📚</div>
-            <div class="stat-content">
-                <h3>Active Programs</h3>
-                <p class="stat-value">{{ total_programs }}</p>
-            </div>
-        </div>
-
-        <div class="stat-card warning">
-            <div class="stat-icon">⏳</div>
-            <div class="stat-content">
-                <h3>Pending</h3>
-                <p class="stat-value">{{ pending_enrollments }}</p>
-            </div>
-        </div>
-
-        <div class="stat-card info">
-            <div class="stat-icon">✅</div>
-            <div class="stat-content">
-                <h3>Approved</h3>
-                <p class="stat-value">{{ approved_enrollments }}</p>
-            </div>
-        </div>
-    </div>
-
-    {% if recent_enrollments %}
-    <div class="section admin-section">
-        <div class="section-header">
-            <h2>⚠️ Pending Approvals</h2>
-            <a href="{% url 'enrollment_list' %}?status=pending" class="btn btn-warning">View All</a>
-        </div>
-
-        <div class="enrollments-grid">
-            {% for enrollment in recent_enrollments %}
-                {% include 'atomic/molecules/enrollment_card.html' with enrollment=enrollment %}
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
-    {% else %}
-    <!-- Student Dashboard -->
-    <div class="stats-grid">
-        <div class="stat-card warning">
-            <div class="stat-icon">⏳</div>
-            <div class="stat-content">
-                <h3>Pending</h3>
-                <p class="stat-value">{{ pending_count }}</p>
-            </div>
-        </div>
-
-        <div class="stat-card success">
-            <div class="stat-icon">✅</div>
-            <div class="stat-content">
-                <h3>Approved</h3>
-                <p class="stat-value">{{ approved_count }}</p>
-            </div>
-        </div>
-
-        <div class="stat-card info">
-            <div class="stat-icon">🎓</div>
-            <div class="stat-content">
-                <h3>Enrolled</h3>
-                <p class="stat-value">{{ enrolled_count }}</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-header">
-            <h2>My Recent Enrollments</h2>
-            <a href="{% url 'enrollment_list' %}" class="btn btn-secondary">View All</a>
-        </div>
-
-        {% if recent_enrollments %}
-        <div class="enrollments-grid">
-            {% for enrollment in recent_enrollments %}
-                {% include 'atomic/molecules/enrollment_card.html' with enrollment=enrollment %}
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <p>No enrollments yet. <a href="{% url 'enrollment_create' %}">Enroll now</a></p>
+    <div style="background: #0a1969; color: white; padding: 40px 60px; border-radius: 25px; margin-bottom: 35px; position: relative; box-shadow: 0 8px 16px rgba(10, 25, 105, 0.1);">
+        <h1 style="margin: 0; font-size: 2.5rem; font-weight: 700;">
+            {% if is_admin %}Good Day, Admin!{% else %}Welcome, {{ user.username|capfirst }}!{% endif %}
+        </h1>
+        <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 1.1rem;">
+            {% if is_admin %}Enrollment Overview and Recent Activities.{% else %}Track your enrollment status below.{% endif %}
+        </p>
+        
+        {% if not is_admin and reg_code %}
+        <div style="position: absolute; top: 20px; right: 40px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 12px; font-weight: 600;">
+            Code: {{ reg_code }}
         </div>
         {% endif %}
     </div>
 
-    <div class="section">
-        <div class="section-header">
-            <h2>Available Programs</h2>
-            <a href="{% url 'program_list' %}" class="btn btn-secondary">View All</a>
-        </div>
+    <h2 style="font-size: 1.2rem; color: #1a1a1a; margin-bottom: 20px; font-weight: 700;">Overview</h2>
 
-        <div class="programs-grid">
-            {% for program in available_programs %}
-                {% include 'atomic/molecules/program_card.html' with program=program %}
-            {% endfor %}
-        </div>
+    <div class="stats-grid {% if is_admin %}admin-grid{% else %}student-grid{% endif %}">
+        {% if is_admin %}
+            <div class="win-card">
+                <span style="font-size: 40px;">👤</span>
+                <p class="win-card-text">Students <span style="font-weight: 800;">{{ total_students }}</span></p>
+            </div>
+            <div class="win-card" style="border: 2px solid #0a1969;">
+                <span style="font-size: 40px;">📖</span>
+                <p class="win-card-text">Active Programs <span style="font-weight: 800;">{{ total_programs }}</span></p>
+            </div>
+            <div class="win-card">
+                <span style="font-size: 40px; color: #107c10;">✔️</span>
+                <p class="win-card-text">Approved <span style="font-weight: 800; color: #107c10;">{{ approved_enrollments }}</span></p>
+            </div>
+            <div class="win-card">
+                <span style="font-size: 40px; color: #d97706;">⌛</span>
+                <p class="win-card-text">Pending <span style="font-weight: 800; color: #d97706;">{{ pending_enrollments }}</span></p>
+            </div>
+        {% else %}
+            <div class="win-card">
+                <span style="font-size: 40px;">⌛</span>
+                <div>
+                    <p class="win-card-label">Pending</p>
+                    <p class="win-card-val" style="color: #d97706;">{{ pending_count }}</p>
+                </div>
+            </div>
+            <div class="win-card">
+                <span style="font-size: 40px;">✔️</span>
+                <div>
+                    <p class="win-card-label">Approved</p>
+                    <p class="win-card-val" style="color: #107c10;">{{ approved_count }}</p>
+                </div>
+            </div>
+            <div class="win-card">
+                <span style="font-size: 40px;">🎓</span>
+                <div>
+                    <p class="win-card-label">Enrolled</p>
+                    <p class="win-card-val" style="color: #0a1969;">{{ enrolled_count }}</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="font-size: 1.2rem; color: #1a1a1a; font-weight: 700;">
+            {% if is_admin %}System Programs{% else %}Enrolled Courses{% endif %}
+        </h2>
+        <a href="{% url 'program_list' %}" style="color: #0a1969; text-decoration: none; font-size: 0.9rem; font-weight: 600;">See all</a>
+    </div>
+
+    <div class="course-grid">
+        {% for item in display_courses %}
+            <div class="course-tile">
+                <h3 style="margin: 0 0 15px 0; font-size: 1.1rem; color: #0a1969; font-weight: 700;">
+                    {% if is_admin %}{{ item.name }}{% else %}{{ item.program.name }}{% endif %}
+                </h3>
+                {% if is_admin %}
+                    <a href="{% url 'program_update' item.id %}" class="view-btn">Edit</a>
+                {% else %}
+                    <a href="{% url 'program_detail' item.program.id %}" class="view-btn">View</a>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div style="grid-column: 1 / -1; padding: 40px; text-align: center; background: #f8fafc; border-radius: 20px; border: 1px dashed #cbd5e1;">
+                <p style="color: #64748b;">No active enrollments found.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if not is_admin %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 50px; margin-bottom: 20px;">
+        <h2 style="font-size: 1.2rem; color: #1a1a1a; font-weight: 700;">Available Programs</h2>
+    </div>
+    <div class="course-grid" style="margin-bottom: 50px;">
+        {% for program in available_courses %}
+            <div class="course-tile" style="background: #f0f4f8;">
+                <h3 style="margin: 0 0 15px 0; font-size: 1.1rem; color: #334155;">{{ program.name }}</h3>
+                <form action="{% url 'enrollment_create' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="program" value="{{ program.id }}">
+                    <button type="submit" class="view-btn" style="border: none; cursor: pointer;">Apply Now</button>
+                </form>
+            </div>
+        {% empty %}
+            {% if not display_courses %}
+            <div style="grid-column: 1 / -1; padding: 40px; text-align: center; background: #fff5f5; border-radius: 20px; border: 1px dashed #feb2b2;">
+                <p style="color: #c53030; font-weight: 600;">There are no programs currently available for enrollment.</p>
+            </div>
+            {% endif %}
+        {% endfor %}
     </div>
     {% endif %}
+
 </div>
+
+<style>
+    /* Grid Layouts */
+    .stats-grid { display: grid; gap: 20px; margin-bottom: 40px; }
+    .admin-grid { grid-template-columns: repeat(2, 1fr); }
+    .student-grid { grid-template-columns: repeat(3, 1fr); }
+    
+    .course-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+        gap: 25px; 
+    }
+
+    /* Card Styles */
+    .win-card {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .win-card-text { margin: 0; font-size: 1.1rem; color: #333; }
+    .win-card-label { margin: 0; font-size: 0.85rem; color: #666; font-weight: 600; }
+    .win-card-val { margin: 0; font-size: 1.8rem; font-weight: 800; }
+
+    /* Course Tiles */
+    .course-tile {
+        background: #eef2ff;
+        padding: 40px 20px;
+        border-radius: 25px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        transition: transform 0.2s;
+    }
+    .course-tile:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(10, 25, 105, 0.1); }
+    
+    .view-btn {
+        background: #0a1969;
+        color: white;
+        padding: 10px 40px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+        display: inline-block;
+        transition: opacity 0.2s;
+    }
+    .view-btn:hover { opacity: 0.9; color: white; }
+
+    /* Responsive Mobile Overrides */
+    @media (max-width: 768px) {
+        .dashboard-container { padding-right: 0 !important; }
+        .admin-grid, .student-grid { grid-template-columns: 1fr; }
+        .course-grid { grid-template-columns: 1fr; }
+        .win-card { padding: 20px; }
+    }
+</style>
 {% endblock %}
