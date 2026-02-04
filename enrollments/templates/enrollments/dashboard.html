@@ -53,10 +53,10 @@
                     <p class="win-card-val" style="color: #107c10;">{{ approved_count }}</p>
                 </div>
             </div>
-            <div class="win-card">
+            <div class="win-card" style="border: 1px solid #0a1969; background: #f0f7ff;">
                 <span style="font-size: 40px;">🎓</span>
                 <div>
-                    <p class="win-card-label">Enrolled</p>
+                    <p class="win-card-label">Total Enrolled</p>
                     <p class="win-card-val" style="color: #0a1969;">{{ enrolled_count }}</p>
                 </div>
             </div>
@@ -65,7 +65,7 @@
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2 style="font-size: 1.2rem; color: #1a1a1a; font-weight: 700;">
-            {% if is_admin %}System Programs{% else %}Enrolled Courses{% endif %}
+            {% if is_admin %}System Programs{% else %}Your Enrolled Courses{% endif %}
         </h2>
         <a href="{% url 'program_list' %}" style="color: #0a1969; text-decoration: none; font-size: 0.9rem; font-weight: 600;">See all</a>
     </div>
@@ -76,15 +76,20 @@
                 <h3 style="margin: 0 0 15px 0; font-size: 1.1rem; color: #0a1969; font-weight: 700;">
                     {% if is_admin %}{{ item.name }}{% else %}{{ item.program.name }}{% endif %}
                 </h3>
+                <div style="margin-bottom: 15px;">
+                    <span style="font-size: 0.8rem; padding: 4px 12px; border-radius: 12px; background: #dcfce7; color: #166534; font-weight: 600;">
+                        Active
+                    </span>
+                </div>
                 {% if is_admin %}
                     <a href="{% url 'program_update' item.id %}" class="view-btn">Edit</a>
                 {% else %}
-                    <a href="{% url 'program_detail' item.program.id %}" class="view-btn">View</a>
+                    <a href="{% url 'program_detail' item.program.id %}" class="view-btn">View Details</a>
                 {% endif %}
             </div>
         {% empty %}
             <div style="grid-column: 1 / -1; padding: 40px; text-align: center; background: #f8fafc; border-radius: 20px; border: 1px dashed #cbd5e1;">
-                <p style="color: #64748b;">No active enrollments found.</p>
+                <p style="color: #64748b;">No active enrollments found. Apply for a program below.</p>
             </div>
         {% endfor %}
     </div>
@@ -97,6 +102,7 @@
         {% for program in available_courses %}
             <div class="course-tile" style="background: #f0f4f8;">
                 <h3 style="margin: 0 0 15px 0; font-size: 1.1rem; color: #334155;">{{ program.name }}</h3>
+                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 20px;">{{ program.code }}</p>
                 <form action="{% url 'enrollment_create' %}" method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="program" value="{{ program.id }}">
