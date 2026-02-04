@@ -72,20 +72,27 @@ def dashboard_view(request):
             'is_admin': True,
             'total_students': Student.objects.count(),
             'total_programs': Program.objects.filter(is_active=True).count(),
-            'approved_enrollments': Enrollment.objects.filter(status='approved').count(),
+            'approved_enrollments': Enrollment.objects.filter(status__in=['approved', 'enrolled']).count(),
             'pending_enrollments': Enrollment.objects.filter(status='pending').count(),
             'display_courses': Program.objects.all(),
         }
     else:
+        # Get all enrollments for this student
         my_enr = Enrollment.objects.filter(student=student) if student else Enrollment.objects.none()
+        
+        # Get IDs of programs the student has already applied for (to hide them from 'Available')
         applied_ids = my_enr.values_list('program_id', flat=True)
+        
+        # Filter enrollments that are officially "done" (Approved or Enrolled)
+        active_enrollments = my_enr.filter(status__in=['approved', 'enrolled'])
+
         context = {
             'is_admin': False,
             'student': student,
             'pending_count': my_enr.filter(status='pending').count(),
             'approved_count': my_enr.filter(status='approved').count(),
-            'enrolled_count': my_enr.filter(status='enrolled').count(),
-            'display_courses': my_enr.filter(status='enrolled'),
+            'enrolled_count': active_enrollments.count(), # This fixes the '0' in the Enrolled card
+            'display_courses': active_enrollments,        # This fixes the "No active enrollments found" list
             'available_courses': Program.objects.filter(is_active=True).exclude(id__in=applied_ids),
             'recent_applications': my_enr.filter(status='pending').order_by('-created_at')[:2],
             'reg_code': student.registration_code if student else None,
