@@ -1,20 +1,66 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div style="max-width: 500px; margin: 50px auto; text-align: center;">
-    <div style="background: white; padding: 40px; border-radius: 35px; border: 1px solid #f1f5f9; box-shadow: 0 20px 40px rgba(0,0,0,0.05);">
-        <div style="font-size: 50px; margin-bottom: 20px;">⚠️</div>
-        <h1 style="color: #0a1969; font-weight: 800; font-size: 1.5rem; margin-bottom: 15px;">Delete Enrollment?</h1>
-        <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px;">
-            Are you sure you want to delete application <strong>#{{ enrollment.enrollment_id }}</strong>? This action is permanent.
-        </p>
-        
-        <form method="post">
-            {% csrf_token %}
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <button type="submit" style="background: #ef4444; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer;">Yes, Confirm Delete</button>
-                <a href="{% url 'enrollment_list' %}" style="background: #f1f5f9; color: #64748b; padding: 15px; border-radius: 15px; text-decoration: none; font-weight: 800;">No, Go Back</a>
+<style>
+    .confirm-container { max-width: 600px; margin: 0 auto; font-family: 'Segoe UI', sans-serif; }
+    .card { background: white; border-radius: 30px; border: 1px solid #f1f5f9; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+    
+    /* Header dynamic colors */
+    .header-approve { background: #f0fdf4; padding: 30px; text-align: center; }
+    .header-reject { background: #fef2f2; padding: 30px; text-align: center; }
+    .title-approve { color: #166534; margin: 0; font-size: 1.5rem; font-weight: 800; }
+    .title-reject { color: #991b1b; margin: 0; font-size: 1.5rem; font-weight: 800; }
+
+    .details-box { background: #f8fafc; border-radius: 20px; padding: 20px; margin-bottom: 30px; }
+    .detail-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    
+    /* Button dynamic colors */
+    .btn-confirm-approve { flex: 2; background: #166534; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; }
+    .btn-confirm-reject { flex: 2; background: #991b1b; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer; }
+    .btn-cancel { flex: 1; text-align: center; background: #f1f5f9; color: #64748b; padding: 15px; border-radius: 15px; text-decoration: none; font-weight: 800; }
+</style>
+
+<div class="confirm-container">
+    <div class="card">
+        <div class="{% if is_approve %}header-approve{% else %}header-reject{% endif %}">
+            <h1 class="{% if is_approve %}title-approve{% else %}title-reject{% endif %}">
+                {% if is_approve %}Approve{% else %}Reject{% endif %} Enrollment
+            </h1>
+        </div>
+
+        <div style="padding: 30px;">
+            <h3 style="font-size: 0.8rem; text-transform: uppercase; color: #64748b; margin-bottom: 20px; letter-spacing: 1px;">Enrollment Details</h3>
+            
+            <div class="details-box">
+                <div class="detail-row">
+                    <span style="color: #64748b; font-weight: 600;">Student:</span>
+                    <span style="font-weight: 800; color: #0a1969;">{{ enrollment.student.user.get_full_name|default:enrollment.student.user.username }}</span>
+                </div>
+                <div class="detail-row">
+                    <span style="color: #64748b; font-weight: 600;">Program:</span>
+                    <span style="font-weight: 800; color: #0a1969;">{{ enrollment.program.name }}</span>
+                </div>
+                <div class="detail-row" style="margin-bottom: 0;">
+                    <span style="color: #64748b; font-weight: 600;">School Year:</span>
+                    <span style="font-weight: 800; color: #0a1969;">{{ enrollment.school_year }}</span>
+                </div>
             </div>
-        </form>
+
+            <form method="post">
+                {% csrf_token %}
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 8px;">Admin Notes</label>
+                    <textarea name="admin_notes" rows="4" style="width: 100%; padding: 15px; border-radius: 15px; border: 1.5px solid #e2e8f0; outline: none;" placeholder="Add specific notes or reasons here..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 12px;">
+                    <button type="submit" class="{% if is_approve %}btn-confirm-approve{% else %}btn-confirm-reject{% endif %}">
+                        Confirm {% if is_approve %}Approval{% else %}Rejection{% endif %}
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
