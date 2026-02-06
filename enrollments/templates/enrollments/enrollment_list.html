@@ -130,6 +130,7 @@
                 <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">ID</th>
                 {% if user.is_staff and view_mode == 'all' %}
                 <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Student</th>
+                <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Username</th>
                 {% endif %}
                 <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Program</th>
                 <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Year Level</th>
@@ -143,6 +144,7 @@
                 <td data-label="ID" style="padding: 18px 20px; font-weight: 700; color: #0a1969;">#{{ enrollment.enrollment_id }}</td>
                 {% if user.is_staff and view_mode == 'all' %}
                 <td data-label="Student" style="padding: 18px 20px; font-weight: 600;">{{ enrollment.student.get_full_name }}</td>
+                <td data-label="Username" style="padding: 18px 20px; color: #475569;">{{ enrollment.student.user.username }}</td>
                 {% endif %}
                 <td data-label="Program" style="padding: 18px 20px;">
                     <span style="background: #eef2ff; color: #1e40af; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700;">{{ enrollment.program.code }}</span>
