@@ -131,6 +131,7 @@
                 {% if user.is_staff %}
                 <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Student</th>
                 <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Username</th>
+                <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Student ID</th>
                 {% endif %}
                 <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Program</th>
                 <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Year Level</th>
@@ -145,6 +146,7 @@
                 {% if user.is_staff %}
                 <td data-label="Student" style="padding: 18px 20px; font-weight: 600;">{{ enrollment.student.get_full_name }}</td>
                 <td data-label="Username" style="padding: 18px 20px; color: #475569;">{{ enrollment.student.user.username }}</td>
+                <td data-label="Student ID" style="padding: 18px 20px; font-weight: 600; color: #0a1969;">{{ enrollment.student.student_id }}</td>
                 {% endif %}
                 <td data-label="Program" style="padding: 18px 20px;">
                     <span style="background: #eef2ff; color: #1e40af; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700;">{{ enrollment.program.code }}</span>
@@ -175,7 +177,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="8" style="padding: 50px; text-align: center; color: #94a3b8; font-weight: 600;">No enrollments found.</td>
+                <td colspan="9" style="padding: 50px; text-align: center; color: #94a3b8; font-weight: 600;">No enrollments found.</td>
             </tr>
             {% endfor %}
         </tbody>
