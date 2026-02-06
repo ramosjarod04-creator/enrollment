@@ -128,7 +128,7 @@
         <thead>
             <tr style="background: #f8fafc; border-bottom: 2px solid #f1f5f9;">
                 <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">ID</th>
-                {% if user.is_staff and view_mode == 'all' %}
+                {% if user.is_staff %}
                 <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Student</th>
                 <th style="padding: 20px; color: #64748b; font-weight: 800; font-size: 0.75rem; text-transform: uppercase;">Username</th>
                 {% endif %}
@@ -142,7 +142,7 @@
             {% for enrollment in enrollments %}
             <tr style="border-bottom: 1px solid #f1f5f9;">
                 <td data-label="ID" style="padding: 18px 20px; font-weight: 700; color: #0a1969;">#{{ enrollment.enrollment_id }}</td>
-                {% if user.is_staff and view_mode == 'all' %}
+                {% if user.is_staff %}
                 <td data-label="Student" style="padding: 18px 20px; font-weight: 600;">{{ enrollment.student.get_full_name }}</td>
                 <td data-label="Username" style="padding: 18px 20px; color: #475569;">{{ enrollment.student.user.username }}</td>
                 {% endif %}
@@ -175,7 +175,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7" style="padding: 50px; text-align: center; color: #94a3b8; font-weight: 600;">No enrollments found.</td>
+                <td colspan="8" style="padding: 50px; text-align: center; color: #94a3b8; font-weight: 600;">No enrollments found.</td>
             </tr>
             {% endfor %}
         </tbody>
